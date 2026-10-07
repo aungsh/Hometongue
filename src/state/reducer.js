@@ -6,24 +6,27 @@ const VERSION = 1
 export const initialState = {
   v: VERSION,
   profile: { dialect: null, person: null },
-  // Mission progress per person + dialect: { learned, practised, accepted, when, completedAt }
+  // Mission progress per person + dialect + mission: { learned, practised, accepted, when, completedAt }
   progress: {},
-  // Reflections: { id, at, person, dialect, outcome, note }
+  // Reflections: { id, at, person, dialect, missionId, outcome, note }
   history: [],
   // Practice takes: { at, person, dialect }
   practices: [],
-  cheered: {},
+  // Coach reactions after practice takes.
   feedbackOn: true,
+  // Whether the coach's lines are spoken aloud (they are always shown as text).
+  coachVoiceOn: true,
 }
 
-const missionKey = ({ person, dialect }) => `${person}:${dialect}`
+const missionKey = ({ person, dialect }, missionId) => `${person}:${dialect}:${missionId}`
 
-export function currentEntry(state) {
-  return state.progress[missionKey(state.profile)]
+/** Where today's mission (`missionId`) is up to for the chosen person and dialect. */
+export function currentEntry(state, missionId) {
+  return state.progress[missionKey(state.profile, missionId)]
 }
 
-function updateEntry(state, changes) {
-  const key = missionKey(state.profile)
+function updateEntry(state, missionId, changes) {
+  const key = missionKey(state.profile, missionId)
   return { ...state, progress: { ...state.progress, [key]: { ...state.progress[key], ...changes } } }
 }
 
@@ -34,28 +37,43 @@ export function reducer(state, action) {
     case 'setPerson':
       return { ...state, profile: { ...state.profile, person: action.person } }
     case 'markLearned':
-      return updateEntry(state, { learned: true })
+      return updateEntry(state, action.missionId, { learned: true })
     case 'logPractice': {
       const { person, dialect } = state.profile
       return { ...state, practices: [...state.practices, { at: action.at, person, dialect }] }
     }
     case 'finishPractice':
-      return updateEntry(state, { practised: true })
+      return updateEntry(state, action.missionId, { practised: true })
     case 'acceptChallenge':
-      return updateEntry(state, { accepted: true, when: action.when })
+      return updateEntry(state, action.missionId, { accepted: true, when: action.when })
     case 'reflect': {
       const { person, dialect } = state.profile
-      const entry = { id: action.id, at: action.at, person, dialect, outcome: action.outcome, note: action.note }
+      const entry = {
+        id: action.id,
+        at: action.at,
+        person,
+        dialect,
+        missionId: action.missionId,
+        outcome: action.outcome,
+        note: action.note,
+      }
       const logged = { ...state, history: [...state.history, entry] }
       // Forgot / no opportunity keep the mission open; a real conversation completes it.
       return isRealConversation(action.outcome)
-        ? updateEntry(logged, { accepted: true, completedAt: action.at, lastOutcome: action.outcome })
-        : updateEntry(logged, { accepted: true, lastOutcome: action.outcome })
+        ? updateEntry(logged, action.missionId, {
+            accepted: true,
+            completedAt: action.at,
+            lastOutcome: action.outcome,
+          })
+        : updateEntry(logged, action.missionId, { accepted: true, lastOutcome: action.outcome })
     }
-    case 'toggleCheer':
-      return { ...state, cheered: { ...state.cheered, [action.friendId]: !state.cheered[action.friendId] } }
     case 'setFeedback':
       return { ...state, feedbackOn: action.on }
+    case 'setCoachVoice':
+      return { ...state, coachVoiceOn: action.on }
+    case 'hydrate':
+      // Replaces everything with saved or imported state (already checked by restore()).
+      return action.state
     case 'loadSample': {
       const today = dayKey(action.now)
       const isToday = (entry) => dayKey(new Date(entry.at)) === today

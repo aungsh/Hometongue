@@ -1,9 +1,12 @@
+import Link from 'next/link'
 import { ArrowRight, CircleCheck, Flame } from 'lucide-react'
-import { navigate } from '../router.js'
+import { useNavigate } from '@/lib/useNavigate.js'
 import { useApp, useMission } from '../state/AppState.jsx'
-import { computeStreak, isRealConversation, questProgress, weekSummary } from '../lib/logic.js'
+import { computeStreak, dayKey, isRealConversation, questProgress, weekSummary } from '../lib/logic.js'
 import { MISSION_APPS, QUESTS, WHEN_OPTIONS, outcomeById } from '../data/catalog.js'
+import { todayCategory } from '@/data/coach.js'
 import Art from '../components/Art.jsx'
+import CoachSay from '../components/CoachSay.jsx'
 import Scene from '../components/Scene.jsx'
 import Tile from '../components/Tile.jsx'
 
@@ -49,6 +52,7 @@ function cardContent({ mission, dialect, step, when, lastCheckIn }) {
 }
 
 function MissionCard({ mission, dialect, entry, step, apps, lastCheckIn }) {
+  const navigate = useNavigate()
   const opener = mission.lines[0]
   const when = WHEN_OPTIONS.find((o) => o.id === entry?.when)?.label
   const content = cardContent({ mission, dialect, step, when, lastCheckIn })
@@ -103,6 +107,7 @@ function MissionCard({ mission, dialect, entry, step, apps, lastCheckIn }) {
 }
 
 export default function Today() {
+  const navigate = useNavigate()
   const { state } = useApp()
   const { mission, dialect, person, partnerSprite, entry, step, apps } = useMission()
   const now = new Date()
@@ -118,10 +123,10 @@ export default function Today() {
           <p className="eyebrow">{greeting(now)}</p>
           <h1 className="title">Today’s mission</h1>
         </div>
-        <a href="#/friends" className="streak-chip" aria-label={`${streak}-day streak. See friends and streaks`}>
+        <Link href="/streak" className="streak-chip" aria-label={`${streak}-day streak. See your streak`}>
           <Flame size={18} aria-hidden="true" />
           {streak}
-        </a>
+        </Link>
       </header>
 
       <button type="button" className="setup-chip" onClick={() => navigate('/setup')}>
@@ -142,6 +147,8 @@ export default function Today() {
         ]}
       />
 
+      <CoachSay category={todayCategory({ missionDone: step === 'done', streak })} seed={dayKey(now)} />
+
       <MissionCard
         mission={mission}
         dialect={dialect}
@@ -152,17 +159,17 @@ export default function Today() {
       />
 
       <section className="tiles" aria-label="This week">
-        <a className="tile tile-card" href="#/progress">
+        <Link className="tile tile-card" href="/progress">
           <span className="tile__label">Real conversations this week</span>
           <span className="tile__value">{week.conversations}</span>
-        </a>
-        <a className="tile tile-card" href="#/quests">
+        </Link>
+        <Link className="tile tile-card" href="/quests">
           <span className="tile__label">Weekly quests done</span>
           <span className="tile__value">
             {questsDone}
             <small>/{QUESTS.length}</small>
           </span>
-        </a>
+        </Link>
       </section>
 
       <section className="stack stack--sm">
@@ -172,7 +179,7 @@ export default function Today() {
             <li key={title}>
               <Tile size="xs" down label="Not revealed yet" />
               <span>{title}</span>
-              <span className="pill">{i === 0 ? 'Tomorrow' : 'Later this week'}</span>
+              <span className="pill">{i === 0 ? 'Up next' : 'After that'}</span>
             </li>
           ))}
         </ul>

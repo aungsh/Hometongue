@@ -1,10 +1,11 @@
 import { ArrowLeft, X } from 'lucide-react'
-import { navigate } from '../router.js'
+import { useNavigate } from '@/lib/useNavigate.js'
 import { appById } from '../data/catalog.js'
 import Tile from './Tile.jsx'
 
 /** Layout for one of the mission's four apps: back to the mission, app name, sticky actions. */
 export default function AppScreen({ app, footer, children }) {
+  const navigate = useNavigate()
   const meta = appById(app)
   return (
     <div className="screen screen--app">

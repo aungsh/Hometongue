@@ -2,7 +2,7 @@ import AudioButton from './AudioButton.jsx'
 import Pixel from './Pixel.jsx'
 
 /** One line of a mission's mini conversation, with the speaker's pixel character. */
-export default function Bubble({ line, partner, partnerSprite, lang }) {
+export default function Bubble({ line, source, partner, partnerSprite, lang }) {
   const mine = line.from === 'you'
   return (
     <div className={`bubble-row ${mine ? 'bubble-row--you' : 'bubble-row--them'}`}>
@@ -18,7 +18,7 @@ export default function Bubble({ line, partner, partnerSprite, lang }) {
           </p>
           <p className="bubble__en">{line.en}</p>
         </div>
-        <AudioButton label={`Play “${line.say}” (placeholder audio)`} />
+        <AudioButton source={source} label={`Play “${line.say}”`} />
       </div>
     </div>
   )

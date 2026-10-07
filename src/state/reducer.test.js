@@ -4,13 +4,14 @@ import { nextStep, dayKey } from '../lib/logic.js'
 
 const NOW = new Date(2026, 9, 1, 15, 0)
 const AT = NOW.toISOString()
+const MID = 'ask-eaten'
 const YESTERDAY = new Date(2026, 8, 30, 20, 0).toISOString()
 
 const run = (state, ...actions) => actions.reduce(reducer, state)
 const onboarded = () =>
   run(initialState, { type: 'setDialect', dialect: 'hokkien' }, { type: 'setPerson', person: 'grandparents' })
-const step = (state) => nextStep(currentEntry(state))
-const reflect = (outcome, at = AT, id = `r-${outcome}`) => ({ type: 'reflect', outcome, note: '', at, id })
+const step = (state) => nextStep(currentEntry(state, MID))
+const reflect = (outcome, at = AT, id = `r-${outcome}`) => ({ type: 'reflect', missionId: MID, outcome, note: '', at, id })
 
 describe('mission flow', () => {
   it('starts a new profile on the learn step', () => {
@@ -18,37 +19,46 @@ describe('mission flow', () => {
   })
 
   it('moves from learn to practise once the phrases are learned', () => {
-    expect(step(run(onboarded(), { type: 'markLearned' }))).toBe('practise')
+    expect(step(run(onboarded(), { type: 'markLearned', missionId: MID }))).toBe('practise')
   })
 
   it('records a practice take without leaving the practise step', () => {
-    const state = run(onboarded(), { type: 'markLearned' }, { type: 'logPractice', at: AT })
+    const state = run(onboarded(), { type: 'markLearned', missionId: MID }, { type: 'logPractice', at: AT })
     expect(state.practices).toEqual([{ at: AT, person: 'grandparents', dialect: 'hokkien' }])
     expect(step(state)).toBe('practise')
   })
 
   it('lets you move on to the challenge without recording (practice is optional)', () => {
-    expect(step(run(onboarded(), { type: 'markLearned' }, { type: 'finishPractice' }))).toBe('challenge')
+    expect(step(run(onboarded(), { type: 'markLearned', missionId: MID }, { type: 'finishPractice', missionId: MID }))).toBe('challenge')
   })
 
   it('waits for a reflection once the challenge is accepted, remembering when', () => {
-    const state = run(onboarded(), { type: 'acceptChallenge', when: 'weekend' })
+    const state = run(onboarded(), { type: 'acceptChallenge', missionId: MID, when: 'weekend' })
     expect(step(state)).toBe('reflect')
-    expect(currentEntry(state).when).toBe('weekend')
+    expect(currentEntry(state, MID).when).toBe('weekend')
   })
 })
 
 describe('reflecting', () => {
   it('logs a natural reflection with its note and completes the mission', () => {
-    const state = run(onboarded(), { type: 'acceptChallenge', when: 'today' }, {
+    const state = run(onboarded(), { type: 'acceptChallenge', missionId: MID, when: 'today' }, {
       type: 'reflect',
+      missionId: MID,
       outcome: 'natural',
       note: 'Ah Ma smiled',
       at: AT,
       id: 'r1',
     })
     expect(state.history).toEqual([
-      { id: 'r1', at: AT, person: 'grandparents', dialect: 'hokkien', outcome: 'natural', note: 'Ah Ma smiled' },
+      {
+        id: 'r1',
+        at: AT,
+        person: 'grandparents',
+        dialect: 'hokkien',
+        missionId: MID,
+        outcome: 'natural',
+        note: 'Ah Ma smiled',
+      },
     ])
     expect(step(state)).toBe('done')
   })
@@ -58,7 +68,7 @@ describe('reflecting', () => {
   })
 
   it('keeps the mission open after forgetting the phrase', () => {
-    const state = run(onboarded(), { type: 'acceptChallenge', when: 'today' }, reflect('forgot'))
+    const state = run(onboarded(), { type: 'acceptChallenge', missionId: MID, when: 'today' }, reflect('forgot'))
     expect(state.history).toHaveLength(1)
     expect(step(state)).toBe('reflect')
   })
@@ -69,13 +79,13 @@ describe('reflecting', () => {
 
   it('remembers the latest outcome so Reflect can invite another try', () => {
     const state = run(onboarded(), reflect('forgot'), reflect('no-chance', AT, 'r2'))
-    expect(currentEntry(state).lastOutcome).toBe('no-chance')
+    expect(currentEntry(state, MID).lastOutcome).toBe('no-chance')
   })
 })
 
 describe('switching person', () => {
   it("gives the new person a fresh mission and keeps the old one's progress", () => {
-    let state = run(onboarded(), { type: 'markLearned' }, { type: 'setPerson', person: 'hawker' })
+    let state = run(onboarded(), { type: 'markLearned', missionId: MID }, { type: 'setPerson', person: 'hawker' })
     expect(step(state)).toBe('learn')
     state = reducer(state, { type: 'setPerson', person: 'grandparents' })
     expect(step(state)).toBe('practise')
@@ -94,27 +104,19 @@ describe('rollover', () => {
   })
 
   it('keeps an accepted challenge from an earlier day open', () => {
-    const state = rollover(run(onboarded(), { type: 'acceptChallenge', when: 'today' }, reflect('no-chance', YESTERDAY)), NOW)
+    const state = rollover(run(onboarded(), { type: 'acceptChallenge', missionId: MID, when: 'today' }, reflect('no-chance', YESTERDAY)), NOW)
     expect(step(state)).toBe('reflect')
   })
 })
 
 describe('restore', () => {
   it('brings back saved progress', () => {
-    const saved = JSON.stringify(run(onboarded(), { type: 'markLearned' }))
+    const saved = JSON.stringify(run(onboarded(), { type: 'markLearned', missionId: MID }))
     expect(step(restore(saved, NOW))).toBe('practise')
   })
 
   it.each([['not json'], ['{"v":999}'], [null], ['null']])('starts fresh from unusable saved data %s', (raw) => {
     expect(restore(raw, NOW)).toEqual(initialState)
-  })
-})
-
-describe('cheering a friend', () => {
-  it('toggles on and off', () => {
-    const once = reducer(initialState, { type: 'toggleCheer', friendId: 'weiling' })
-    expect(once.cheered.weiling).toBe(true)
-    expect(reducer(once, { type: 'toggleCheer', friendId: 'weiling' }).cheered.weiling).toBeFalsy()
   })
 })
 
@@ -145,5 +147,41 @@ describe('reset', () => {
     const state = reducer(run(onboarded(), reflect('natural')), { type: 'reset' })
     expect(state.profile).toEqual({ dialect: null, person: null })
     expect(state.history).toEqual([])
+  })
+})
+
+describe('hydrate', () => {
+  it('replaces the whole state with saved or imported state', () => {
+    const saved = run(onboarded(), { type: 'markLearned', missionId: MID })
+    expect(reducer(initialState, { type: 'hydrate', state: saved })).toBe(saved)
+  })
+})
+
+describe('coach voice', () => {
+  it('is on by default and can be switched off and on', () => {
+    expect(initialState.coachVoiceOn).toBe(true)
+    const off = reducer(initialState, { type: 'setCoachVoice', on: false })
+    expect(off.coachVoiceOn).toBe(false)
+    expect(reducer(off, { type: 'setCoachVoice', on: true }).coachVoiceOn).toBe(true)
+  })
+
+  it('defaults to on for progress saved before the setting existed', () => {
+    const { coachVoiceOn, ...older } = run(onboarded(), { type: 'markLearned', missionId: MID })
+    expect(restore(JSON.stringify(older), NOW).coachVoiceOn).toBe(true)
+  })
+})
+
+describe('separate missions', () => {
+  it('keeps progress for each mission on its own', () => {
+    const state = run(onboarded(), { type: 'markLearned', missionId: 'ask-eaten' })
+    expect(nextStep(currentEntry(state, 'ask-eaten'))).toBe('practise')
+    expect(nextStep(currentEntry(state, 'praise-cooking'))).toBe('learn')
+  })
+
+  it('records which mission a reflection was about', () => {
+    const state = run(onboarded(), { ...reflect('natural'), missionId: 'praise-cooking' })
+    expect(state.history[0].missionId).toBe('praise-cooking')
+    expect(nextStep(currentEntry(state, 'praise-cooking'))).toBe('done')
+    expect(nextStep(currentEntry(state, 'ask-eaten'))).toBe('learn')
   })
 })

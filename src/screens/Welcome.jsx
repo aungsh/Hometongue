@@ -1,4 +1,4 @@
-import { navigate } from '../router.js'
+import { useNavigate } from '@/lib/useNavigate.js'
 import { APP_NAME, DIALECTS } from '../data/catalog.js'
 import Scene from '../components/Scene.jsx'
 import Tile from '../components/Tile.jsx'
@@ -14,6 +14,7 @@ const CAST = [
 const BUBBLES = ['hokkien', 'cantonese', 'teochew']
 
 export default function Welcome() {
+  const navigate = useNavigate()
   return (
     <div className="screen screen--onboarding screen--welcome">
       <Scene cast={CAST} height={250} className="welcome__scene">

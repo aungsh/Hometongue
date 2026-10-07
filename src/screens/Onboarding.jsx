@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { ArrowLeft } from 'lucide-react'
-import { navigate } from '../router.js'
+import { useNavigate } from '@/lib/useNavigate.js'
 import { useApp } from '../state/AppState.jsx'
 import { DialectPicker, PersonPicker } from '../components/Pickers.jsx'
 import Tile from '../components/Tile.jsx'
 
 function OnboardingHead({ step, backTo }) {
+  const navigate = useNavigate()
   return (
     <header className="onboarding-head">
       <button type="button" className="icon-btn" onClick={() => navigate(backTo)} aria-label="Back">
@@ -28,6 +29,7 @@ function OnboardingHead({ step, backTo }) {
 }
 
 export function OnboardingDialect() {
+  const navigate = useNavigate()
   const { state, dispatch } = useApp()
   const [dialect, setDialect] = useState(state.profile.dialect)
 
@@ -56,6 +58,7 @@ export function OnboardingDialect() {
 }
 
 export function OnboardingPerson() {
+  const navigate = useNavigate()
   const { state, dispatch } = useApp()
   const [person, setPerson] = useState(state.profile.person)
 

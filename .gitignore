@@ -1,5 +1,8 @@
 node_modules
 dist
+.next
 .orchestrator
 *.log
 .DS_Store
+.env*.local
+next-env.d.ts

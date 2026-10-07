@@ -1,19 +1,21 @@
 import { useState } from 'react'
 import { Heart, ShieldCheck, Smile } from 'lucide-react'
-import { navigate } from '../../router.js'
+import { useNavigate } from '@/lib/useNavigate.js'
 import { useApp, useMission } from '../../state/AppState.jsx'
 import { WHEN_OPTIONS } from '../../data/catalog.js'
 import AppScreen from '../../components/AppScreen.jsx'
 import AudioButton from '../../components/AudioButton.jsx'
+import { phraseSource } from '@/lib/audioSources.js'
 
 export default function Challenge() {
+  const navigate = useNavigate()
   const { dispatch, showToast } = useApp()
-  const { mission, dialect, entry } = useMission()
+  const { mission, missionId, dialect, entry } = useMission()
   const [when, setWhen] = useState(entry?.when ?? WHEN_OPTIONS[0].id)
   const [opener, reply, followUp] = mission.lines
 
   const accept = () => {
-    dispatch({ type: 'acceptChallenge', when })
+    dispatch({ type: 'acceptChallenge', missionId, when })
     showToast('Challenge accepted! Your pocket card is saved.')
     navigate('/mission')
   }
@@ -41,7 +43,7 @@ export default function Challenge() {
       <article className="pocket tile-card" aria-label="Pocket card">
         <div className="pocket__top">
           <span className="eyebrow">Pocket card</span>
-          <AudioButton label="Play the opener (placeholder audio)" />
+          <AudioButton source={phraseSource(dialect.id, missionId, 0, opener.zh)} label="Play the opener" />
         </div>
         <p className="phrase-say">{opener.say}</p>
         <p className="phrase-zh" lang={dialect.lang}>

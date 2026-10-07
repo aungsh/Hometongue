@@ -1,6 +1,7 @@
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { FlaskConical } from 'lucide-react'
-import { navigate } from '../router.js'
+import { useNavigate } from '@/lib/useNavigate.js'
 import { useApp } from '../state/AppState.jsx'
 import { isRealConversation, journeyStage, weekDays, weekSummary } from '../lib/logic.js'
 import { plural, relativeDay } from '../lib/format.js'
@@ -44,6 +45,7 @@ function Journey({ total }) {
 }
 
 function PrototypeControls() {
+  const navigate = useNavigate()
   const { dispatch, showToast } = useApp()
   const [confirming, setConfirming] = useState(false)
 
@@ -71,19 +73,22 @@ function PrototypeControls() {
     <section className="card controls" aria-labelledby="controls-title">
       <h2 className="section-title" id="controls-title">
         <FlaskConical size={16} aria-hidden="true" />
-        Prototype controls
+        Testing tools
       </h2>
-      <p className="muted">For demos and testing. Everything stays in this browser.</p>
+      <p className="muted">For demos and testing. “Reset everything” erases your progress on this device (save a backup first in Your setup).</p>
       <div className="controls__row">
-        <button type="button" className="btn btn--secondary btn--small" onClick={loadSample}>
-          Load a sample week
-        </button>
+        {/* Sample data would pollute a real person's streaks, so it only exists while developing. */}
+        {process.env.NODE_ENV !== 'production' && (
+          <button type="button" className="btn btn--secondary btn--small" onClick={loadSample}>
+            Load a sample week
+          </button>
+        )}
         <button
           type="button"
           className={`btn btn--small ${confirming ? 'btn--danger' : 'btn--secondary'}`}
           onClick={reset}
         >
-          {confirming ? 'Tap again to reset' : 'Reset prototype'}
+          {confirming ? 'Tap again to reset' : 'Reset everything'}
         </button>
       </div>
     </section>
@@ -110,9 +115,9 @@ export default function Progress() {
           {week.conversations} this week · {plural(state.history.length, 'check-in')} in total
         </p>
         {real.length === 0 && (
-          <a className="btn btn--primary btn--small" href="#/today">
+          <Link className="btn btn--primary btn--small" href="/today">
             Go to today’s mission
-          </a>
+          </Link>
         )}
       </section>
 
@@ -170,7 +175,7 @@ export default function Progress() {
                 <li key={h.id} className="log__item tile-card">
                   <Tile glyph={outcome.glyph} size="sm" tone={OUTCOME_TONE[outcome.id]} />
                   <div>
-                    <p className="log__title">{getMission(h.person, h.dialect).title}</p>
+                    <p className="log__title">{getMission(h.person, h.dialect, h.missionId).title}</p>
                     <p className="log__meta">
                       {outcome.label} · {DIALECTS[h.dialect].name} · {relativeDay(new Date(h.at), now)}
                     </p>

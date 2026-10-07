@@ -1,11 +1,8 @@
-import { useState } from 'react'
 import { Flame, UserPlus } from 'lucide-react'
+import { shareOrCopy } from '@/lib/share.js'
 import { useApp } from '../state/AppState.jsx'
-import { computeStreak, weekDays, weekSummary } from '../lib/logic.js'
-import { plural } from '../lib/format.js'
-import { DIALECTS, WEEKDAY_GLYPHS } from '../data/catalog.js'
-import { FRIENDS } from '../data/friends.js'
-import Pixel from '../components/Pixel.jsx'
+import { computeStreak, weekDays } from '../lib/logic.js'
+import { WEEKDAY_GLYPHS } from '../data/catalog.js'
 import Tile from '../components/Tile.jsx'
 
 const FULL_DAY = new Intl.DateTimeFormat('en-SG', { weekday: 'long' })
@@ -22,30 +19,25 @@ function streakMessage(streak, checkedInToday) {
   return 'Check in today to keep it going.'
 }
 
-export default function Friends() {
-  const { state, dispatch, showToast } = useApp()
-  const [nudged, setNudged] = useState({})
+export default function Streak() {
+  const { state, showToast } = useApp()
   const now = new Date()
   const streak = computeStreak(state.history, now)
   const days = weekDays(state.history, now)
   const checkedInToday = days.some((d) => d.isToday && d.checkedIn)
-  const week = weekSummary(state.history, state.practices, now)
-  const myDialect = state.profile.dialect
 
-  const cheer = (friend) => {
-    const cheered = Boolean(state.cheered[friend.id])
-    dispatch({ type: 'toggleCheer', friendId: friend.id })
-    if (!cheered) showToast(`You cheered ${friend.name} on 👏`)
-  }
-
-  const nudge = (friend) => {
-    setNudged((n) => ({ ...n, [friend.id]: true }))
-    showToast(`Sent ${friend.name} a gentle nudge`)
+  const invite = async () => {
+    const result = await shareOrCopy({
+      text: 'I’m learning to speak dialect with Hometongue, one small conversation a day. Join me?',
+      url: window.location.origin,
+    })
+    if (result === 'copied') showToast('Invite copied. Paste it to a friend!')
+    if (result === 'failed') showToast('Couldn’t share from this browser')
   }
 
   return (
     <div className="screen screen--tab">
-      <h1 className="title">Friends & streaks</h1>
+      <h1 className="title">Your streak</h1>
 
       <section className="card tile-card streak" aria-label="Your streak">
         <div className="streak__top">
@@ -76,84 +68,21 @@ export default function Friends() {
         <p className="fineprint">Any reflection keeps your streak, even “No opportunity”.</p>
       </section>
 
-      <section className="stack stack--sm">
-        <div className="section-head">
-          <h2 className="section-title">Your circle</h2>
-          <button
-            type="button"
-            className="btn btn--ghost btn--small"
-            onClick={() => showToast('Invites aren’t live in this prototype')}
-          >
-            <UserPlus size={16} aria-hidden="true" />
-            Invite
-          </button>
-        </div>
-
-        <ul className="card tile-card friends">
-          <li className="friend friend--you" data-dialect={myDialect}>
-            <span className="avatar" aria-hidden="true">
-              <Pixel sprite="you" scale={2} motion="bob" />
-            </span>
-            <div className="friend__body">
-              <p className="friend__name">
-                You <span className="tag">{DIALECTS[myDialect].name}</span>
-              </p>
-              <p className="friend__activity">{plural(week.conversations, 'real conversation')} this week</p>
-            </div>
-            <span className="friend__streak" aria-label={`${streak}-day streak`}>
-              <Flame size={14} aria-hidden="true" />
-              {streak}
-            </span>
-          </li>
-
-          {FRIENDS.map((friend) => {
-            const cheered = Boolean(state.cheered[friend.id])
-            return (
-              <li key={friend.id} className="friend" data-dialect={friend.dialect}>
-                <span className="avatar" aria-hidden="true">
-                  <Pixel sprite={friend.sprite} scale={2} motion={friend.quiet ? 'still' : 'bob'} />
-                </span>
-                <div className="friend__body">
-                  <p className="friend__name">
-                    {friend.name} <span className="tag">{DIALECTS[friend.dialect].name}</span>
-                  </p>
-                  <p className="friend__activity">
-                    {friend.activity}
-                    {friend.when && ` · ${friend.when}`}
-                  </p>
-                </div>
-                <div className="friend__side">
-                  <span className="friend__streak" aria-label={`${friend.streak}-day streak`}>
-                    <Flame size={14} aria-hidden="true" />
-                    {friend.streak}
-                  </span>
-                  {friend.quiet ? (
-                    <button
-                      type="button"
-                      className="btn btn--secondary btn--small"
-                      disabled={nudged[friend.id]}
-                      onClick={() => nudge(friend)}
-                    >
-                      {nudged[friend.id] ? 'Nudged' : 'Nudge'}
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      className={`btn btn--small ${cheered ? 'btn--soft' : 'btn--secondary'}`}
-                      aria-pressed={cheered}
-                      onClick={() => cheer(friend)}
-                    >
-                      {cheered ? 'Cheered' : 'Cheer'}
-                    </button>
-                  )}
-                </div>
-              </li>
-            )
-          })}
-        </ul>
+      <section className="card tile-card stack stack--sm" aria-labelledby="invite-title">
+        <h2 className="section-title" id="invite-title">
+          Learn together
+        </h2>
+        <p className="muted">
+          Everyone’s streak is their own, kept on their own phone. Send the app to a friend or cousin who also
+          understands more than they speak.
+        </p>
+        <button type="button" className="btn btn--secondary btn--small" onClick={invite}>
+          <UserPlus size={16} aria-hidden="true" />
+          Invite a friend
+        </button>
       </section>
 
-      <p className="footnote">No rankings here. Just friends keeping each other going.</p>
+      <p className="footnote">No rankings here. Just you and your own small steps.</p>
     </div>
   )
 }

@@ -1,5 +1,6 @@
+import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
-import { navigate } from '../router.js'
+import { useNavigate } from '@/lib/useNavigate.js'
 import { useMission } from '../state/AppState.jsx'
 import { MISSION_APPS } from '../data/catalog.js'
 import Scene from '../components/Scene.jsx'
@@ -9,6 +10,7 @@ const STATUS_TEXT = { done: 'Done', retry: 'Try again when you can' }
 
 /** The mission's home: four apps (Learn, Practise, Challenge, Reflect) to open in any order. */
 export default function MissionHub() {
+  const navigate = useNavigate()
   const { mission, dialect, partnerSprite, entry, apps, suggested } = useMission()
   const opener = mission.lines[0]
 
@@ -59,7 +61,7 @@ export default function MissionHub() {
           const isNext = suggested === app.id
           return (
             <li key={app.id}>
-              <a href={`#/mission/${app.id}`} className={`app-tile tile-card${isNext ? ' is-next' : ''}`}>
+              <Link href={`/mission/${app.id}`} className={`app-tile tile-card${isNext ? ' is-next' : ''}`}>
                 {isNext && <span className="app-tile__ribbon">Up next</span>}
                 {status === 'done' && <Seal glyph="完" className="app-tile__seal" />}
                 <Tile glyph={app.glyph} size="lg" tone="accent" />
@@ -68,7 +70,7 @@ export default function MissionHub() {
                 <span className={`app-tile__status app-tile__status--${status}`}>
                   {STATUS_TEXT[status] ?? app.blurb}
                 </span>
-              </a>
+              </Link>
             </li>
           )
         })}

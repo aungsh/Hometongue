@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { Check } from 'lucide-react'
 import { useApp } from '../state/AppState.jsx'
 import { addDays, questProgress, startOfWeek, weekSummary } from '../lib/logic.js'
@@ -77,9 +78,9 @@ export default function Quests() {
                 {q.done ? `${q.badgeName} badge earned` : `Earns the ${q.badgeName} badge`}
               </p>
               {q.link && !q.done && (
-                <a className="link" href={`#${q.link.to}`}>
+                <Link className="link" href={q.link.to}>
                   {q.link.label}
-                </a>
+                </Link>
               )}
             </div>
           </li>

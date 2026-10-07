@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   appStatus,
   suggestedApp,
+  todaysMissionId,
   dayKey,
   startOfWeek,
   computeStreak,
@@ -227,5 +228,49 @@ describe('weekDays', () => {
   it('counts real conversations and any check-ins per day', () => {
     expect(days.map((d) => d.conversations)).toEqual([0, 1, 0, 1, 0, 0, 0])
     expect(days.map((d) => d.checkedIn)).toEqual([false, true, false, true, false, false, false])
+  })
+})
+
+describe('todaysMissionId', () => {
+  const ids = ['a', 'b', 'c']
+  const who = { person: 'hawker', dialect: 'hokkien' }
+  const NOW = new Date(2026, 9, 7, 15, 0)
+  const entry = (daysAgo, outcome = 'natural', over = {}) => ({
+    at: new Date(2026, 9, 7 - daysAgo, 12).toISOString(),
+    person: 'hawker',
+    dialect: 'hokkien',
+    outcome,
+    ...over,
+  })
+
+  it('starts on the first mission', () => {
+    expect(todaysMissionId(ids, [], who, NOW)).toBe('a')
+  })
+
+  it('stays on the same mission for the rest of the day you complete it', () => {
+    expect(todaysMissionId(ids, [entry(0)], who, NOW)).toBe('a')
+  })
+
+  it('moves on the day after a real conversation', () => {
+    expect(todaysMissionId(ids, [entry(1)], who, NOW)).toBe('b')
+    expect(todaysMissionId(ids, [entry(1, 'awkward')], who, NOW)).toBe('b')
+  })
+
+  it('does not move on after forgetting or having no chance', () => {
+    expect(todaysMissionId(ids, [entry(1, 'forgot'), entry(2, 'no-chance')], who, NOW)).toBe('a')
+  })
+
+  it('counts a day once however many conversations it had', () => {
+    expect(todaysMissionId(ids, [entry(1), entry(1)], who, NOW)).toBe('b')
+  })
+
+  it('only counts this person and dialect', () => {
+    const others = [entry(1, 'natural', { person: 'grandparents' }), entry(2, 'natural', { dialect: 'teochew' })]
+    expect(todaysMissionId(ids, others, who, NOW)).toBe('a')
+  })
+
+  it('starts over after the last mission', () => {
+    expect(todaysMissionId(ids, [entry(1), entry(2), entry(3)], who, NOW)).toBe('a')
+    expect(todaysMissionId(ids, [entry(1), entry(2), entry(3), entry(4)], who, NOW)).toBe('b')
   })
 })

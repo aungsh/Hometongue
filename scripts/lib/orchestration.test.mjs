@@ -41,7 +41,7 @@ describe('checkNode', () => {
     ['v20.19.0', true],
     ['v20.18.1', false],
     ['v18.20.4', false],
-  ])("Vite's ^20.19.0 || >=22.12.0 rule: %s → %s", (version, ok) => {
+  ])("^20.19.0 || >=22.12.0 rule: %s → %s", (version, ok) => {
     expect(checkNode(version).ok).toBe(ok)
   })
 })

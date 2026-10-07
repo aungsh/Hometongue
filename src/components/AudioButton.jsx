@@ -1,27 +1,18 @@
-import { useEffect, useState } from 'react'
-import { Volume2 } from 'lucide-react'
+'use client'
 
-const PLAY_MS = 1800
+import { Volume2, VolumeX } from 'lucide-react'
+import { useCanPlay, usePlayback } from '@/lib/usePlayback.js'
 
-/**
- * Placeholder audio. It animates for a moment instead of playing anything:
- * native-speaker recordings would be wired in here.
- */
-export default function AudioButton({ label, text }) {
-  const [playing, setPlaying] = useState(false)
-
-  useEffect(() => {
-    if (!playing) return undefined
-    const timer = setTimeout(() => setPlaying(false), PLAY_MS)
-    return () => clearTimeout(timer)
-  }, [playing])
-
+/** The speaker button itself. Shows a moving equaliser while `playing`. */
+export function PlayButton({ playing, disabled, onClick, label, text }) {
   return (
     <button
       type="button"
       className={`audio-btn${text ? ' audio-btn--text' : ''}${playing ? ' is-playing' : ''}`}
       aria-label={label}
-      onClick={() => setPlaying(true)}
+      aria-pressed={playing}
+      disabled={disabled}
+      onClick={onClick}
     >
       {playing ? (
         <span className="eq" aria-hidden="true">
@@ -29,10 +20,30 @@ export default function AudioButton({ label, text }) {
           <i />
           <i />
         </span>
+      ) : disabled ? (
+        <VolumeX size={18} aria-hidden="true" />
       ) : (
         <Volume2 size={18} aria-hidden="true" />
       )}
       {text && <span aria-hidden="true">{playing ? 'Playing…' : text}</span>}
     </button>
+  )
+}
+
+/**
+ * Plays a clip: `source` is { src, speech } from lib/audioSources.js.
+ * With nothing to play on this device the button is disabled rather than pretending.
+ */
+export default function AudioButton({ source, label, text }) {
+  const { playing, toggle } = usePlayback()
+  const canPlay = useCanPlay(source)
+  return (
+    <PlayButton
+      playing={playing !== null}
+      disabled={!canPlay}
+      onClick={() => toggle(source)}
+      label={canPlay ? label : `${label} (no recording yet)`}
+      text={text}
+    />
   )
 }

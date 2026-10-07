@@ -1,13 +1,15 @@
 import { DIALECTS } from './catalog.js'
+import { MORE_MISSIONS } from './missionsLibrary.js'
 
-// One daily mission per person, each a three-line mini conversation in every dialect.
+// Three missions per person (the first lives here, the rest in missionsLibrary.js), each a
+// three-line mini conversation in every dialect. They run in order, one per day you complete.
 //
 // PROTOTYPE CONTENT: these phrases were drafted for demo purposes and must be
 // checked by native speakers before real use (the Teochew most of all).
 // `say` is a Singapore-style "say it like" spelling, not a formal romanisation;
 // `zh` uses simplified characters; `from` is 'you' or 'them'.
 
-const MISSIONS = {
+const FIRST_MISSIONS = {
   grandparents: {
     id: 'ask-eaten',
     title: 'Ask Ah Ma if she’s eaten',
@@ -17,7 +19,6 @@ const MISSIONS = {
     scenario: 'Next visit or video call, open with the classic family greeting.',
     challenge: 'Ask Ah Ma in {dialect} the next time you visit or call.',
     culture: 'For many elders, “Have you eaten?” isn’t really about food. It’s how families say “I care about you.”',
-    upcoming: ['Tell Ah Ma her cooking is delicious', 'Ask Ah Gong about his kampung days'],
     lines: {
       hokkien: [
         { from: 'you', say: 'Ah Ma, jiak ba buay?', zh: '阿嬷，食饱未？', en: 'Ah Ma, have you eaten?' },
@@ -60,7 +61,6 @@ const MISSIONS = {
     scenario: 'At your usual kopitiam or drinks stall, place your order in dialect.',
     challenge: 'Place your next drinks order in {dialect} at any kopitiam.',
     culture: 'Kopitiam lingo is already a mix: “kopi” is from Malay, while “O” (black) and “peng” (ice) come from Hokkien. You’re halfway there.',
-    upcoming: ['Ask the uncle what’s good today', 'Say thank you when you return your tray'],
     lines: {
       hokkien: [
         { from: 'you', say: 'Towkay, kopi-O peng chit pue!', zh: '头家，咖啡乌冰一杯！', en: 'Boss, one iced kopi-O!' },
@@ -103,7 +103,6 @@ const MISSIONS = {
     scenario: 'At the next family dinner, swap the English small talk for one line in dialect.',
     challenge: 'Try it on an auntie or uncle at your next family gathering.',
     culture: 'Relatives often switch to English or Mandarin for you. Starting in dialect tells them it’s okay to stay in it.',
-    upcoming: ['Tell your relatives what you’ve been busy with', 'Wish everyone good health at the next gathering'],
     lines: {
       hokkien: [
         { from: 'you', say: 'Ah Yee, li ho bo?', zh: '阿姨，你好无？', en: 'Auntie, how are you?' },
@@ -143,7 +142,6 @@ const MISSIONS = {
     scenario: 'At the void deck, lift lobby or wet market, start with everyone’s favourite topic: the weather.',
     challenge: 'Use it on a neighbour at the void deck, lift lobby or market.',
     culture: 'Small talk with neighbours keeps the kampung spirit alive, and elders are often happy to chat back.',
-    upcoming: ['Say good morning at the lift lobby', 'Ask where Uncle is heading today'],
     lines: {
       hokkien: [
         { from: 'you', say: 'Ah Pek, kin na jit jin juah!', zh: '阿伯，今仔日真热！', en: 'Uncle, it’s so hot today!' },
@@ -175,16 +173,34 @@ const MISSIONS = {
   },
 }
 
+const MISSIONS = Object.fromEntries(
+  Object.entries(FIRST_MISSIONS).map(([person, first]) => [person, [first, ...(MORE_MISSIONS[person] ?? [])]]),
+)
+
 const fill = (text, dialect) => text.replaceAll('{dialect}', DIALECTS[dialect].name)
 
-/** The mission for a person, resolved for one dialect. */
-export function getMission(person, dialect) {
-  const mission = MISSIONS[person]
+/** Mission ids for a person, in the order they are served. */
+export const missionIds = (person) => MISSIONS[person].map((mission) => mission.id)
+
+/** Every mission id in the library, for checking audio coverage. */
+export const allMissions = () =>
+  Object.entries(MISSIONS).flatMap(([person, list]) => list.map((mission) => ({ person, id: mission.id })))
+
+/**
+ * A mission for a person, resolved for one dialect. An unknown or missing id gives the first
+ * mission (reflections saved before there were several missions have no id).
+ * `upcoming` lists the titles of the next two missions, in the order they will come.
+ */
+export function getMission(person, dialect, missionId) {
+  const list = MISSIONS[person]
+  const index = Math.max(0, list.findIndex((mission) => mission.id === missionId))
+  const mission = list[index]
   return {
     ...mission,
     title: fill(mission.title, dialect),
     challenge: fill(mission.challenge, dialect),
     lines: mission.lines[dialect],
     tips: mission.tips[dialect],
+    upcoming: [1, 2].map((offset) => fill(list[(index + offset) % list.length].title, dialect)),
   }
 }

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { navigate } from '../../router.js'
+import { useNavigate } from '@/lib/useNavigate.js'
 import { useApp, useMission } from '../../state/AppState.jsx'
 import { OUTCOMES } from '../../data/catalog.js'
 import AppScreen from '../../components/AppScreen.jsx'
@@ -11,13 +11,14 @@ const OUTCOME_TONE = { natural: 'jade', awkward: 'red', forgot: 'blue', 'no-chan
 const newId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 
 export default function Reflect() {
+  const navigate = useNavigate()
   const { dispatch } = useApp()
-  const { mission, dialect } = useMission()
+  const { mission, missionId, dialect } = useMission()
   const [outcome, setOutcome] = useState(null)
   const [note, setNote] = useState('')
 
   const save = () => {
-    dispatch({ type: 'reflect', outcome, note: note.trim(), at: new Date().toISOString(), id: newId() })
+    dispatch({ type: 'reflect', missionId, outcome, note: note.trim(), at: new Date().toISOString(), id: newId() })
     navigate('/mission/done', { replace: true })
   }
 

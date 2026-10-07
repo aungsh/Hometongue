@@ -36,11 +36,11 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const RUN_DIR = join(ROOT, '.orchestrator')
 const STATE_FILE = join(RUN_DIR, 'state.json')
 const LOG_FILE = join(RUN_DIR, 'server.log')
-const VITE_BIN = join(ROOT, 'node_modules', 'vite', 'bin', 'vite.js')
+const NEXT_BIN = join(ROOT, 'node_modules', 'next', 'dist', 'bin', 'next')
 const VITEST_BIN = join(ROOT, 'node_modules', 'vitest', 'vitest.mjs')
-const PAGE_MARKER = '<title>Hometongue</title>'
-const FIRST_PORT = 5173
-const START_TIMEOUT_MS = 30_000
+const PAGE_MARKER = '<title>Hometongue'
+const FIRST_PORT = 3000
+const START_TIMEOUT_MS = 90_000 // the first page compiles on demand in dev mode
 const STOP_TIMEOUT_MS = 5_000
 
 const say = (message) => console.log(`[hometongue] ${message}`)
@@ -161,18 +161,21 @@ async function start({ open, host }) {
   }
   if (!(await prepare())) return false
 
+  // `next dev` is started directly, so refresh the list of audio clips here (npm's predev hook won't run).
+  spawnSync(process.execPath, [join(ROOT, 'scripts', 'build-audio-manifest.mjs'), '--quiet'], { cwd: ROOT })
+
   const port = await findFreePort(FIRST_PORT)
   if (port !== FIRST_PORT) say(`Port ${FIRST_PORT} is busy, so using ${port}.`)
 
   mkdirSync(RUN_DIR, { recursive: true })
   appendFileSync(LOG_FILE, `\n=== ${new Date().toISOString()} starting on port ${port} ===\n`)
   const logFd = openSync(LOG_FILE, 'a')
-  const args = [VITE_BIN, '--port', String(port), '--strictPort']
-  if (host) args.push('--host')
+  const args = [NEXT_BIN, 'dev', '--port', String(port)]
+  if (host) args.push('--hostname', '0.0.0.0')
   const server = spawn(process.execPath, args, {
     cwd: ROOT,
-    // Plain text in the log file: Vite colours its output on Windows even when it isn't a terminal.
-    env: { ...process.env, NO_COLOR: '1' },
+    // Plain text in the log file: Next colours its output even when it isn't a terminal.
+    env: { ...process.env, NO_COLOR: '1', NEXT_TELEMETRY_DISABLED: '1' },
     detached: true,
     stdio: ['ignore', logFd, logFd],
     windowsHide: true,

@@ -128,3 +128,20 @@ export function suggestedApp(entry) {
   if (!e.practised) return 'practise'
   return 'challenge'
 }
+
+/**
+ * Which mission is today's. A person's missions run in order and move on one day after you
+ * complete one: the count is how many earlier days had a real conversation with that person in
+ * that dialect. Forgetting or finding no chance keeps the same mission open, and completing it
+ * today keeps it on screen (as done) until tomorrow. After the last mission the list starts over.
+ */
+export function todaysMissionId(ids, history, { person, dialect }, now) {
+  const today = dayKey(now)
+  const completedDays = new Set(
+    history
+      .filter((h) => h.person === person && h.dialect === dialect && isRealConversation(h.outcome))
+      .map(dayOf)
+      .filter((day) => day < today),
+  )
+  return ids[completedDays.size % ids.length]
+}

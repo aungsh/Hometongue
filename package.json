@@ -1,9 +1,9 @@
 {
-  "name": "hometongue-prototype",
+  "name": "hometongue",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
-  "description": "Clickable prototype: low-pressure dialect conversation missions (Hokkien, Teochew, Cantonese) for young Singaporeans.",
+  "description": "Low-pressure dialect conversation missions (Hokkien, Teochew, Cantonese) for young Singaporeans.",
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
   },
@@ -13,20 +13,24 @@
     "start": "node scripts/orchestrator.mjs start",
     "stop": "node scripts/orchestrator.mjs stop",
     "status": "node scripts/orchestrator.mjs status",
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
+    "dev": "next dev",
+    "build": "next build",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "serve": "next start",
+    "predev": "node scripts/build-audio-manifest.mjs --quiet",
+    "prebuild": "node scripts/build-audio-manifest.mjs --quiet",
+    "audio:manifest": "node scripts/build-audio-manifest.mjs",
+    "audio:coach": "node scripts/generate-coach-audio.mjs",
+    "audio:sheet": "node scripts/recording-sheet.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.49.0",
+    "next": "16.4.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^6.1.1",
-    "vite": "^8.3.2",
     "vitest": "^5.0.3"
   }
 }

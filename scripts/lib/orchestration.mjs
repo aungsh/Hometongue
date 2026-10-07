@@ -4,7 +4,7 @@ import { get } from 'node:http'
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname } from 'node:path'
 
-/** Vite 8 supports Node ^20.19.0 || >=22.12.0. */
+/** The toolchain (Next.js 16, Vitest 5 on Vite 8) supports Node ^20.19.0 || >=22.12.0. */
 export function checkNode(version) {
   const [major, minor] = version.replace(/^v/, '').split('.').map(Number)
   const ok = (major === 20 && minor >= 19) || (major === 22 && minor >= 12) || major > 22
@@ -12,7 +12,7 @@ export function checkNode(version) {
     ok,
     message: ok
       ? `Node ${version} is supported.`
-      : `Node ${version} isn't supported by Vite 8. Install Node 20.19+ or 22.12+ and try again.`,
+      : `Node ${version} isn't supported by this project's tooling. Install Node 20.19+ or 22.12+ and try again.`,
   }
 }
 
