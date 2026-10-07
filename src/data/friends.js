@@ -1,0 +1,40 @@
+// Mock friend circle. Streaks and activity are static for the prototype; `sprite` is their pixel avatar.
+export const FRIENDS = [
+  {
+    id: 'weiling',
+    sprite: 'youLong',
+    name: 'Wei Ling',
+    dialect: 'cantonese',
+    streak: 12,
+    activity: 'Ordered dim sum in Cantonese',
+    when: '2h ago',
+  },
+  {
+    id: 'marcus',
+    sprite: 'you',
+    name: 'Marcus',
+    dialect: 'teochew',
+    streak: 5,
+    activity: 'Asked Ah Gong about his kampung days',
+    when: 'Yesterday',
+  },
+  {
+    id: 'aisyah',
+    sprite: 'youLong',
+    name: 'Aisyah',
+    dialect: 'hokkien',
+    streak: 3,
+    activity: 'Said “kam siah” to the chicken rice uncle',
+    when: 'Yesterday',
+  },
+  {
+    id: 'junjie',
+    sprite: 'you',
+    name: 'Jun Jie',
+    dialect: 'hokkien',
+    streak: 0,
+    activity: 'Last checked in 4 days ago',
+    when: '',
+    quiet: true,
+  },
+]

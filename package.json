@@ -1,0 +1,32 @@
+{
+  "name": "hometongue-prototype",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Clickable prototype: low-pressure dialect conversation missions (Hokkien, Teochew, Cantonese) for young Singaporeans.",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "scripts": {
+    "orch": "node scripts/orchestrator.mjs",
+    "setup": "node scripts/orchestrator.mjs setup",
+    "start": "node scripts/orchestrator.mjs start",
+    "stop": "node scripts/orchestrator.mjs stop",
+    "status": "node scripts/orchestrator.mjs status",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "lucide-react": "^1.49.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.1",
+    "vite": "^8.3.2",
+    "vitest": "^5.0.3"
+  }
+}
