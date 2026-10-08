@@ -110,11 +110,12 @@ export default function Today() {
   const navigate = useNavigate()
   const { state } = useApp()
   const { mission, dialect, person, partnerSprite, entry, step, apps } = useMission()
+  if (!mission || !dialect || !person) return null
   const now = new Date()
   const streak = computeStreak(state.history, now)
   const week = weekSummary(state.history, state.practices, now)
   const questsDone = questProgress(QUESTS, week).filter((q) => q.done).length
-  const lastCheckIn = state.history.findLast((h) => h.person === person.id && h.dialect === dialect.id)
+  const lastCheckIn = [...state.history].reverse().find((h) => h.person === person.id && h.dialect === dialect.id)
 
   return (
     <div className="screen screen--tab">

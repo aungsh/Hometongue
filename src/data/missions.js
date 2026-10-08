@@ -180,7 +180,7 @@ const MISSIONS = Object.fromEntries(
 const fill = (text, dialect) => text.replaceAll('{dialect}', DIALECTS[dialect].name)
 
 /** Mission ids for a person, in the order they are served. */
-export const missionIds = (person) => MISSIONS[person].map((mission) => mission.id)
+export const missionIds = (person) => (MISSIONS[person] ?? []).map((mission) => mission.id)
 
 /** Every mission id in the library, for checking audio coverage. */
 export const allMissions = () =>
@@ -192,15 +192,16 @@ export const allMissions = () =>
  * `upcoming` lists the titles of the next two missions, in the order they will come.
  */
 export function getMission(person, dialect, missionId) {
-  const list = MISSIONS[person]
+  const list = MISSIONS[person] ?? Object.values(MISSIONS)[0]
+  const safeDialect = DIALECTS[dialect] ? dialect : Object.keys(DIALECTS)[0]
   const index = Math.max(0, list.findIndex((mission) => mission.id === missionId))
   const mission = list[index]
   return {
     ...mission,
-    title: fill(mission.title, dialect),
-    challenge: fill(mission.challenge, dialect),
-    lines: mission.lines[dialect],
-    tips: mission.tips[dialect],
-    upcoming: [1, 2].map((offset) => fill(list[(index + offset) % list.length].title, dialect)),
+    title: fill(mission.title, safeDialect),
+    challenge: fill(mission.challenge, safeDialect),
+    lines: mission.lines[safeDialect],
+    tips: mission.tips[safeDialect],
+    upcoming: [1, 2].map((offset) => fill(list[(index + offset) % list.length].title, safeDialect)),
   }
 }

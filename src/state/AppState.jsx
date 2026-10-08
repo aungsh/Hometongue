@@ -58,6 +58,11 @@ export function useApp() {
 export function useMission() {
   const { state } = useApp()
   const { dialect, person } = state.profile
+  // During onboarding (or with a stale backup) there is no mission yet: return safe
+  // nulls so screens can redirect instead of crashing inside missionIds()/getMission().
+  if (!DIALECTS[dialect] || !PEOPLE[person]) {
+    return { missionId: null, mission: null, dialect: null, person: null, partnerSprite: null, entry: null, step: 'learn', apps: null, suggested: null }
+  }
   const missionId = todaysMissionId(missionIds(person), state.history, state.profile, new Date())
   const entry = currentEntry(state, missionId)
   return {

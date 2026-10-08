@@ -29,13 +29,13 @@ export default function Practise() {
   const navigate = useNavigate()
   const { state, dispatch } = useApp()
   const { mission, missionId, dialect, person } = useMission()
-  const yourLines = mission.lines.filter((line) => line.from === 'you')
+  const yourLines = (mission?.lines ?? []).filter((line) => line.from === 'you')
   const [lineIndex, setLineIndex] = useState(0)
   const [takes, setTakes] = useState(0) // takes of the current line
   const [anyTake, setAnyTake] = useState(false) // any take at all, on any line
   const [rating, setRating] = useState(null)
   const [unrecorded, setUnrecorded] = useState(false) // said it aloud without the mic
-  const line = yourLines[lineIndex]
+  const line = yourLines[lineIndex] ?? null
 
   const onTake = () => {
     setTakes((n) => n + 1)
@@ -49,9 +49,12 @@ export default function Practise() {
   const recording = status === 'recording'
   const busy = status !== 'idle'
 
-  const nativeSource = phraseSource(dialect.id, missionId, mission.lines.indexOf(line), line.zh)
+  const nativeSource = line
+    ? phraseSource(dialect?.id, missionId, (mission?.lines ?? []).indexOf(line), line.zh)
+    : null
   const canHearNative = useCanPlay(nativeSource)
   const { playing, play, stop } = usePlayback()
+  if (!mission || !dialect || !line) return null
   // Every button goes through here so a running "native, then mine" never carries on after another tap.
   const run = useRef(0)
   const start = (source, key) => {

@@ -12,6 +12,7 @@ export default function Challenge() {
   const { dispatch, showToast } = useApp()
   const { mission, missionId, dialect, entry } = useMission()
   const [when, setWhen] = useState(entry?.when ?? WHEN_OPTIONS[0].id)
+  if (!mission || !dialect) return null
   const [opener, reply, followUp] = mission.lines
 
   const accept = () => {

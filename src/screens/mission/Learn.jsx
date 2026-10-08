@@ -22,6 +22,7 @@ export default function Learn() {
   const navigate = useNavigate()
   const { dispatch } = useApp()
   const { mission, missionId, dialect, person, partnerSprite } = useMission()
+  if (!mission || !dialect || !person) return null
   const sources = mission.lines.map((line, i) => phraseSource(dialect.id, missionId, i, line.zh))
   const recorded = sources.filter((source) => source.src).length
 

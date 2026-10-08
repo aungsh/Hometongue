@@ -16,6 +16,7 @@ export default function Reflect() {
   const { mission, missionId, dialect } = useMission()
   const [outcome, setOutcome] = useState(null)
   const [note, setNote] = useState('')
+  if (!mission || !dialect) return null
 
   const save = () => {
     dispatch({ type: 'reflect', missionId, outcome, note: note.trim(), at: new Date().toISOString(), id: newId() })
