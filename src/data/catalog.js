@@ -22,8 +22,8 @@ export const DIALECTS = {
   cantonese: {
     id: 'cantonese',
     name: 'Cantonese',
-    zh: '广东话',
-    lang: 'yue-Hans',
+    zh: '廣東話',
+    lang: 'yue-Hant',
     blurb: 'Chinatown, dim sum and TVB dramas',
     sample: 'Sik jor fan mei ah?',
   },

@@ -4,7 +4,8 @@
 //
 // DRAFT CONTENT: like the first missions, these phrases must be checked by native speakers before
 // real use (the Teochew most of all). Lines go you → them → you. `say` is a Singapore-style
-// "say it like" spelling, not a formal romanisation; `zh` uses simplified characters.
+// "say it like" spelling, not a formal romanisation; `zh` uses simplified characters
+// (Traditional HK written form for Cantonese).
 
 export const MORE_MISSIONS = {
   grandparents: [
@@ -32,7 +33,7 @@ export const MORE_MISSIONS = {
         cantonese: [
           { from: 'you', say: 'Ah Ma, hou sik a!', zh: '阿嫲，好食呀！', en: 'Ah Ma, so delicious!' },
           { from: 'them', say: 'Sik do di la!', zh: '食多啲啦！', en: 'Eat a bit more!' },
-          { from: 'you', say: 'Ngo sik baau la, do ze!', zh: '我食饱喇，多谢！', en: 'I’m full, thank you!' },
+          { from: 'you', say: 'Ngo sik baau la, do ze!', zh: '我食飽喇，多謝！', en: 'I’m full, thank you!' },
         ],
       },
       tips: {
@@ -72,9 +73,9 @@ export const MORE_MISSIONS = {
           { from: 'you', say: 'Wa ai thia!', zh: '我爱听！', en: 'I’d love to hear!' },
         ],
         cantonese: [
-          { from: 'you', say: 'Ah Gung, gam bong gei ho ma?', zh: '阿公，甘榜几好嘛？', en: 'Ah Gong, was kampung life good?' },
-          { from: 'them', say: 'Ho a! Ngo gong bei nei teng!', zh: '好呀！我讲俾你听！', en: 'It was! Let me tell you!' },
-          { from: 'you', say: 'Ngo seung teng!', zh: '我想听！', en: 'I want to hear!' },
+          { from: 'you', say: 'Ah Gung, gam bong gei ho ma?', zh: '阿公，甘榜幾好嘛？', en: 'Ah Gong, was kampung life good?' },
+          { from: 'them', say: 'Ho a! Ngo gong bei nei teng!', zh: '好呀！我講畀你聽！', en: 'It was! Let me tell you!' },
+          { from: 'you', say: 'Ngo seung teng!', zh: '我想聽！', en: 'I want to hear!' },
         ],
       },
       tips: {
@@ -114,9 +115,9 @@ export const MORE_MISSIONS = {
           { from: 'you', say: 'Ho, wa ai ze ge!', zh: '好，我爱这个！', en: 'Okay, I’ll have this one!' },
         ],
         cantonese: [
-          { from: 'you', say: 'Lo ban, gam yat mat ye hou sik a?', zh: '老板，今日乜嘢好食呀？', en: 'Boss, what’s good today?' },
-          { from: 'them', say: 'Ni go hou sik!', zh: '呢个好食！', en: 'This one is good!' },
-          { from: 'you', say: 'Hou, ngo yiu ni go, m goi!', zh: '好，我要呢个，唔该！', en: 'Okay, I’ll take this one, please!' },
+          { from: 'you', say: 'Lo ban, gam yat mat ye hou sik a?', zh: '老闆，今日乜嘢好食呀？', en: 'Boss, what’s good today?' },
+          { from: 'them', say: 'Ni go hou sik!', zh: '呢個好食！', en: 'This one is good!' },
+          { from: 'you', say: 'Hou, ngo yiu ni go, m goi!', zh: '好，我要呢個，唔該！', en: 'Okay, I’ll take this one, please!' },
         ],
       },
       tips: {
@@ -153,9 +154,9 @@ export const MORE_MISSIONS = {
           { from: 'you', say: 'Ah Yi, jiak ba bue?', zh: '阿姨，食饱未？', en: 'Auntie, have you eaten?' },
         ],
         cantonese: [
-          { from: 'you', say: 'Ah Yi, m goi saai!', zh: '阿姨，唔该晒！', en: 'Auntie, thanks a lot!' },
-          { from: 'them', say: 'M sai haak hei!', zh: '唔使客气！', en: 'Don’t mention it!' },
-          { from: 'you', say: 'Ah Yi, sik jor fan mei a?', zh: '阿姨，食咗饭未呀？', en: 'Auntie, have you eaten?' },
+          { from: 'you', say: 'Ah Yi, m goi saai!', zh: '阿姨，唔該晒！', en: 'Auntie, thanks a lot!' },
+          { from: 'them', say: 'M sai haak hei!', zh: '唔使客氣！', en: 'Don’t mention it!' },
+          { from: 'you', say: 'Ah Yi, sik jor fan mei a?', zh: '阿姨，食咗飯未呀？', en: 'Auntie, have you eaten?' },
         ],
       },
       tips: {
@@ -194,7 +195,7 @@ export const MORE_MISSIONS = {
         cantonese: [
           { from: 'you', say: 'Ah Suk, ngo hou mong a!', zh: '阿叔，我好忙呀！', en: 'Uncle, I’m so busy!' },
           { from: 'them', say: 'Mong mat ye a?', zh: '忙乜嘢呀？', en: 'Busy with what?' },
-          { from: 'you', say: 'Ngo jou gan ye la.', zh: '我做紧嘢啦。', en: 'I’m working lah.' },
+          { from: 'you', say: 'Ngo jou gan ye la.', zh: '我做緊嘢啦。', en: 'I’m working lah.' },
         ],
       },
       tips: {
@@ -225,9 +226,9 @@ export const MORE_MISSIONS = {
           { from: 'you', say: 'Yam seng!', zh: '饮胜！', en: 'Cheers!' },
         ],
         cantonese: [
-          { from: 'you', say: 'San tai gin hong!', zh: '身体健康！', en: 'Good health to everyone!' },
+          { from: 'you', say: 'San tai gin hong!', zh: '身體健康！', en: 'Good health to everyone!' },
           { from: 'them', say: 'Gin hong! Gin hong!', zh: '健康！健康！', en: 'Good health! Good health!' },
-          { from: 'you', say: 'Yam sing!', zh: '饮胜！', en: 'Cheers!' },
+          { from: 'you', say: 'Yam sing!', zh: '飲勝！', en: 'Cheers!' },
         ],
       },
       tips: {
@@ -263,7 +264,7 @@ export const MORE_MISSIONS = {
         cantonese: [
           { from: 'you', say: 'Ah Pak, jou san!', zh: '阿伯，早晨！', en: 'Uncle, good morning!' },
           { from: 'them', say: 'Jou san! Nei dou hou jou a!', zh: '早晨！你都好早呀！', en: 'Morning! You’re early too!' },
-          { from: 'you', say: 'Sik jor fan mei a?', zh: '食咗饭未呀？', en: 'Have you eaten?' },
+          { from: 'you', say: 'Sik jor fan mei a?', zh: '食咗飯未呀？', en: 'Have you eaten?' },
         ],
       },
       tips: {
@@ -294,8 +295,8 @@ export const MORE_MISSIONS = {
           { from: 'you', say: 'Ho lah, sio sim oh!', zh: '好啦，小心哦！', en: 'Okay, take care!' },
         ],
         cantonese: [
-          { from: 'you', say: 'Ah Pak, heoi bin dou a?', zh: '阿伯，去边度呀？', en: 'Uncle, where are you heading?' },
-          { from: 'them', say: 'Heoi yam ga fe la!', zh: '去饮咖啡啦！', en: 'Going for kopi!' },
+          { from: 'you', say: 'Ah Pak, heoi bin dou a?', zh: '阿伯，去邊度呀？', en: 'Uncle, where are you heading?' },
+          { from: 'them', say: 'Heoi yam ga fe la!', zh: '去飲咖啡啦！', en: 'Going for kopi!' },
           { from: 'you', say: 'Hou a, siu sam di a!', zh: '好呀，小心啲呀！', en: 'Okay, take care!' },
         ],
       },
