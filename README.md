@@ -43,9 +43,12 @@ Three kinds of sound, from most to least important:
    `<mission>-<line>.mp3`, e.g. `public/audio/phrases/hokkien/ask-eaten-1.mp3`. Then `npm run audio:manifest`
    (or just restart `npm run dev`). mp3, m4a, wav, ogg and webm are accepted. Until a clip exists its speaker
    button is switched off. Cantonese lines fall back to the phone's own Cantonese voice if it has one.
+   Free shortcut (no keys): `pip install edge-tts`, then `npm run audio:dialect` generates all 36 Cantonese
+   clips (`zh-HK-HiuMaanNeural` for you, `zh-HK-WanLungNeural` for them) plus the coach lines below.
+   Hokkien + Teochew are skipped on purpose — a Mandarin voice would teach the wrong sounds.
 2. **Coach voice** (Auntie Coach, Singlish). Scripted lines live in `src/data/coach.js`;
-   `npm run audio:coach` turns them into mp3s with an ElevenLabs voice. Without clips she uses the
-   phone's English voice.
+   `npm run audio:coach` turns them into mp3s with an ElevenLabs voice, or `npm run audio:dialect`
+   makes them free with `en-SG-LunaNeural`. Without clips she uses the phone's English voice.
 3. **Your own recording** in Practise, played back from memory.
 
 `npm run audio:manifest` prints how many clips of each kind exist.
@@ -131,6 +134,7 @@ scripts/
   orchestrator.mjs      the orch commands and menu
   build-audio-manifest.mjs  scans public/audio → src/data/audioManifest.json (runs before dev/build)
   generate-coach-audio.mjs  coach lines → mp3 with ElevenLabs
+  generate-dialect-audio.mjs  Cantonese + coach clips, free via Edge TTS (no key)
   recording-sheet.mjs       the list of phrases to record
   lib/                  helpers (tested)
 src/

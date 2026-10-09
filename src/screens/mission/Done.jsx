@@ -49,7 +49,7 @@ const FALLING = ['中', '发', '福', '东', '南', '西', '北', '喜', '一', 
 export default function Done() {
   const navigate = useNavigate()
   const { state, showToast } = useApp()
-  const last = state.history.at(-1)
+  const last = state.history.length > 0 ? state.history[state.history.length - 1] : null
 
   useEffect(() => {
     if (!last) navigate('/today', { replace: true })

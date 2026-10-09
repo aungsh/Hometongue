@@ -23,7 +23,7 @@ export default function AskAuntie() {
   const [busy, setBusy] = useState(false)
   const [answer, setAnswer] = useState(null) // { text, src } | { error }
 
-  if (!status.enabled) return null
+  if (!status.enabled || !dialect || !person) return null
 
   const submit = async (event) => {
     event.preventDefault()

@@ -85,7 +85,15 @@ export function reducer(state, action) {
       }
     }
     case 'reset':
-      return initialState
+      return {
+        v: VERSION,
+        profile: { dialect: null, person: null },
+        progress: {},
+        history: [],
+        practices: [],
+        feedbackOn: true,
+        coachVoiceOn: true,
+      }
     default:
       return state
   }
@@ -105,10 +113,19 @@ export function rollover(state, now) {
 /** Rebuilds state from saved JSON. Anything unreadable or from another version starts fresh. */
 export function restore(raw, now) {
   try {
+    if (typeof raw !== 'string' || !raw) return { ...initialState, profile: { ...initialState.profile } }
     const saved = JSON.parse(raw)
-    if (!saved || saved.v !== VERSION) return initialState
-    return rollover({ ...initialState, ...saved }, now)
+    if (!saved || saved.v !== VERSION) return { ...initialState, profile: { ...initialState.profile } }
+    const merged = {
+      ...initialState,
+      ...saved,
+      profile: { ...initialState.profile, ...(saved.profile ?? {}) },
+      progress: { ...(saved.progress ?? {}) },
+      history: Array.isArray(saved.history) ? saved.history : [],
+      practices: Array.isArray(saved.practices) ? saved.practices : [],
+    }
+    return rollover(merged, now)
   } catch {
-    return initialState
+    return { ...initialState, profile: { ...initialState.profile } }
   }
 }

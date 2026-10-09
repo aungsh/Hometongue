@@ -22,6 +22,7 @@
     "prebuild": "node scripts/build-audio-manifest.mjs --quiet",
     "audio:manifest": "node scripts/build-audio-manifest.mjs",
     "audio:coach": "node scripts/generate-coach-audio.mjs",
+    "audio:dialect": "node scripts/generate-dialect-audio.mjs",
     "audio:sheet": "node scripts/recording-sheet.mjs"
   },
   "dependencies": {

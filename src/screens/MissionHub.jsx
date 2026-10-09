@@ -12,6 +12,7 @@ const STATUS_TEXT = { done: 'Done', retry: 'Try again when you can' }
 export default function MissionHub() {
   const navigate = useNavigate()
   const { mission, dialect, partnerSprite, entry, apps, suggested } = useMission()
+  if (!mission || !dialect) return null
   const opener = mission.lines[0]
 
   return (

@@ -7,7 +7,8 @@ import { MORE_MISSIONS } from './missionsLibrary.js'
 // PROTOTYPE CONTENT: these phrases were drafted for demo purposes and must be
 // checked by native speakers before real use (the Teochew most of all).
 // `say` is a Singapore-style "say it like" spelling, not a formal romanisation;
-// `zh` uses simplified characters; `from` is 'you' or 'them'.
+// `zh` uses simplified characters, except Cantonese which uses Traditional HK written form;
+// `from` is 'you' or 'them'.
 
 const FIRST_MISSIONS = {
   grandparents: {
@@ -31,7 +32,7 @@ const FIRST_MISSIONS = {
         { from: 'you', say: 'Wa jiak ba liao!', zh: '我食饱了！', en: 'I’ve eaten!' },
       ],
       cantonese: [
-        { from: 'you', say: 'Ah Ma, sik jor fan mei ah?', zh: '阿嫲，食咗饭未呀？', en: 'Ah Ma, have you eaten?' },
+        { from: 'you', say: 'Ah Ma, sik jor fan mei ah?', zh: '阿嫲，食咗飯未呀？', en: 'Ah Ma, have you eaten?' },
         { from: 'them', say: 'Sik jor la! Nei ne?', zh: '食咗喇！你呢？', en: 'I’ve eaten! And you?' },
         { from: 'you', say: 'Ngo dou sik jor la.', zh: '我都食咗喇。', en: 'I’ve eaten too.' },
       ],
@@ -73,9 +74,9 @@ const FIRST_MISSIONS = {
         { from: 'you', say: 'Do sia!', zh: '多谢！', en: 'Thank you!' },
       ],
       cantonese: [
-        { from: 'you', say: 'Lo ban, kopi-O peng yat bui, m goi!', zh: '老板，咖啡乌冰一杯，唔该！', en: 'Boss, one iced kopi-O, please!' },
+        { from: 'you', say: 'Lo ban, kopi-O peng yat bui, m goi!', zh: '老闆，咖啡烏冰一杯，唔該！', en: 'Boss, one iced kopi-O, please!' },
         { from: 'them', say: 'Yat man luk.', zh: '一蚊六。', en: 'That’s $1.60.' },
-        { from: 'you', say: 'M goi saai!', zh: '唔该晒！', en: 'Thanks a lot!' },
+        { from: 'you', say: 'M goi saai!', zh: '唔該晒！', en: 'Thanks a lot!' },
       ],
     },
     tips: {
@@ -115,9 +116,9 @@ const FIRST_MISSIONS = {
         { from: 'you', say: 'Wa ho, do sia Ah Yi!', zh: '我好，多谢阿姨！', en: 'I’m good, thanks Auntie!' },
       ],
       cantonese: [
-        { from: 'you', say: 'Ah Yi, nei gei ho ma?', zh: '阿姨，你几好嘛？', en: 'Auntie, are you keeping well?' },
-        { from: 'them', say: 'Gei ho ah! Nei ne?', zh: '几好呀！你呢？', en: 'Pretty good! And you?' },
-        { from: 'you', say: 'Ngo dou gei ho, bat gwo ho mong.', zh: '我都几好，不过好忙。', en: 'I’m good too, just busy.' },
+        { from: 'you', say: 'Ah Yi, nei gei ho ma?', zh: '阿姨，你幾好嘛？', en: 'Auntie, are you keeping well?' },
+        { from: 'them', say: 'Gei ho ah! Nei ne?', zh: '幾好呀！你呢？', en: 'Pretty good! And you?' },
+        { from: 'you', say: 'Ngo dou gei ho, bat gwo ho mong.', zh: '我都幾好，不過好忙。', en: 'I’m good too, just busy.' },
       ],
     },
     tips: {
@@ -154,9 +155,9 @@ const FIRST_MISSIONS = {
         { from: 'you', say: 'Ai jiak zui oh!', zh: '爱食水哦！', en: 'Remember to drink water!' },
       ],
       cantonese: [
-        { from: 'you', say: 'Ah Pak, gam yat ho yit ah!', zh: '阿伯，今日好热呀！', en: 'Uncle, it’s so hot today!' },
-        { from: 'them', say: 'Hai ah, yit dou sei!', zh: '系呀，热到死！', en: 'Yeah, it’s deadly hot!' },
-        { from: 'you', say: 'Gei dak yam do di seui ah!', zh: '记得饮多啲水呀！', en: 'Remember to drink more water!' },
+        { from: 'you', say: 'Ah Pak, gam yat ho yit ah!', zh: '阿伯，今日好熱呀！', en: 'Uncle, it’s so hot today!' },
+        { from: 'them', say: 'Hai ah, yit dou sei!', zh: '係呀，熱到死！', en: 'Yeah, it’s deadly hot!' },
+        { from: 'you', say: 'Gei dak yam do di seui ah!', zh: '記得飲多啲水呀！', en: 'Remember to drink more water!' },
       ],
     },
     tips: {
@@ -180,7 +181,7 @@ const MISSIONS = Object.fromEntries(
 const fill = (text, dialect) => text.replaceAll('{dialect}', DIALECTS[dialect].name)
 
 /** Mission ids for a person, in the order they are served. */
-export const missionIds = (person) => MISSIONS[person].map((mission) => mission.id)
+export const missionIds = (person) => (MISSIONS[person] ?? []).map((mission) => mission.id)
 
 /** Every mission id in the library, for checking audio coverage. */
 export const allMissions = () =>
@@ -192,15 +193,16 @@ export const allMissions = () =>
  * `upcoming` lists the titles of the next two missions, in the order they will come.
  */
 export function getMission(person, dialect, missionId) {
-  const list = MISSIONS[person]
+  const list = MISSIONS[person] ?? Object.values(MISSIONS)[0]
+  const safeDialect = DIALECTS[dialect] ? dialect : Object.keys(DIALECTS)[0]
   const index = Math.max(0, list.findIndex((mission) => mission.id === missionId))
   const mission = list[index]
   return {
     ...mission,
-    title: fill(mission.title, dialect),
-    challenge: fill(mission.challenge, dialect),
-    lines: mission.lines[dialect],
-    tips: mission.tips[dialect],
-    upcoming: [1, 2].map((offset) => fill(list[(index + offset) % list.length].title, dialect)),
+    title: fill(mission.title, safeDialect),
+    challenge: fill(mission.challenge, safeDialect),
+    lines: mission.lines[safeDialect],
+    tips: mission.tips[safeDialect],
+    upcoming: [1, 2].map((offset) => fill(list[(index + offset) % list.length].title, safeDialect)),
   }
 }

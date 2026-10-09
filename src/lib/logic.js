@@ -136,6 +136,7 @@ export function suggestedApp(entry) {
  * today keeps it on screen (as done) until tomorrow. After the last mission the list starts over.
  */
 export function todaysMissionId(ids, history, { person, dialect }, now) {
+  if (!Array.isArray(ids) || ids.length === 0) return null
   const today = dayKey(now)
   const completedDays = new Set(
     history

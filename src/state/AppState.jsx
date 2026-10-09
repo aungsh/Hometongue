@@ -38,6 +38,26 @@ export function AppProvider({ children }) {
     }
   }, [state, ready])
 
+  // If the tab stays open past midnight, roll over completed missions when it becomes
+  // visible again, so tomorrow's mission appears without a reload.
+  useEffect(() => {
+    if (!ready) return undefined
+    let lastDay = new Date().toDateString()
+    const check = () => {
+      const today = new Date().toDateString()
+      if (today !== lastDay) {
+        lastDay = today
+        dispatch({ type: 'hydrate', state: restore(window.localStorage.getItem(STORAGE_KEY), new Date()) })
+      }
+    }
+    document.addEventListener('visibilitychange', check)
+    window.addEventListener('focus', check)
+    return () => {
+      document.removeEventListener('visibilitychange', check)
+      window.removeEventListener('focus', check)
+    }
+  }, [ready])
+
   useEffect(() => {
     if (!toast) return undefined
     const timer = setTimeout(() => setToast(null), 2600)
@@ -58,6 +78,11 @@ export function useApp() {
 export function useMission() {
   const { state } = useApp()
   const { dialect, person } = state.profile
+  // During onboarding (or with a stale backup) there is no mission yet: return safe
+  // nulls so screens can redirect instead of crashing inside missionIds()/getMission().
+  if (!DIALECTS[dialect] || !PEOPLE[person]) {
+    return { missionId: null, mission: null, dialect: null, person: null, partnerSprite: null, entry: null, step: 'learn', apps: null, suggested: null }
+  }
   const missionId = todaysMissionId(missionIds(person), state.history, state.profile, new Date())
   const entry = currentEntry(state, missionId)
   return {
